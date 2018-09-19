@@ -9,6 +9,10 @@ final class Library : PostgreSQLModel {
       self.id = id
       self.title = title
   }
+
+  var books : Children<Library, Book> {
+    return children(\.library_id)
+  }
 }
 
 extension Library: Migration { }

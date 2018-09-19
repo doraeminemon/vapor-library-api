@@ -7,9 +7,16 @@ final class LibraryController {
         return Library.query(on: req).all()
     }
 
-    // /// Returns a list of all `Book`s belong to a `Library`
-    // func books(_ req: Request) throws -> Future<[Book]> {
-    //   let library_id = 1
-    //   return Book.filter(\.name == library_id).all()
-    // }
+    /// Returns a list of all `Book`s belong to a `Library`
+    func books(_ req: Request) throws -> Future<[Book]> {
+        let library_id: Int = try req.parameters.next(Int.self)
+        let logger = try req.make(Logger.self)
+        let books = Book
+            .query(on: req)
+            .all()
+            .map{ books in
+                return books.filter{$0.library_id == library_id}
+            }
+        return books
+    }
 }

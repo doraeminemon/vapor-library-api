@@ -17,7 +17,7 @@ extension Application {
   func sendRequest<Body>(to path: String,
                          method: HTTPMethod,
                          headers: HTTPHeaders = .init(),
-                         body: Body? = nil)
+                         body: Body?)
                          throws -> Response where Body: Content {
         var headers = headers
 

@@ -22,7 +22,8 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
         hostname: "127.0.0.1",
         port: 5432,
         username: "postgres",
-        database: "postgres",
+        database: env == Environment.testing ?
+        "library_api_test" : "library_api",
         password: nil
     )
     services.register(postgresqlConfig)

@@ -18,13 +18,46 @@ class LibrariesTest: XCTestCase {
 
   func testThatLibrariesReturned() throws {
     let title = "Alexandra"
-    let response = try app.sendRequest(to: "/libraries", method: .GET)
+    let library = try Library.create(title: title, on: conn)
+    let body : EmptyBody? = nil
+    let response = try app.sendRequest(to: "/libraries", method: .GET, body: body)
+    let content = try response.content
+      .decode(Array<Library>.self)
+      .wait()
 
-    XCTAssertEqual(response.content, "[]")
+    XCTAssertEqual(content.count, 1)
+    XCTAssertEqual(content[0].title, title)
+  }
+
+  func testThatLibrariesBooksReturned() throws {
+    let lib_title = "Alexandra", book_title = "Odyssey"
+    let library = try Library.create(title: lib_title, on: conn)
+    let book = try Book.create(title: book_title, library_id: library.id!, on: conn)
+    let body : EmptyBody? = nil
+    let response = try app.sendRequest(to: "/libraries/\(library.id!)/books",
+                                       method: .GET,
+                                       body: body)
+    let content = try response.content
+      .decode(Array<Book>.self)
+      .wait()
+
+    content.forEach{ book in
+      XCTAssertEqual(book.library_id, library.id!)
+    }
+    XCTAssertEqual(content.count, 1)
+    XCTAssertEqual(content[0].title, book_title)
   }
 
   override func tearDown() {
     super.tearDown()
+    try! conn
+      .raw("DELETE FROM \"Book\"")
+      .run()
+      .wait()
+    try! conn
+      .raw("DELETE FROM \"Library\"")
+      .run()
+      .wait()
     conn.close()
   }
 }
