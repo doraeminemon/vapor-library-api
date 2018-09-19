@@ -2,13 +2,13 @@ import Vapor
 import FluentPostgreSQL
 
 final class Book : PostgreSQLModel {
-  var id: Int?
-  var title: String
+  var id        : Int?
+  var title     : String
   var library_id: Int
 
   init(id: Int? = nil, title: String, library_id: Int) {
-      self.id = id
-      self.title = title
+      self.id         = id
+      self.title      = title
       self.library_id = library_id
   }
 }

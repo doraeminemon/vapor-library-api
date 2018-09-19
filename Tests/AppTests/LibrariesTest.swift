@@ -12,15 +12,14 @@ class LibrariesTest: XCTestCase {
   override func setUp() {
     super.setUp()
 
-    app = try! Application.testable()
+    app = try! Application.testable() // Dependencies injection
     conn = try! app.newConnection(to: .psql).wait()
   }
 
   func testThatLibrariesReturned() throws {
     let title = "Alexandra"
-    let library = try Library.create(title: title, on: conn)
-    let body : EmptyBody? = nil
-    let response = try app.sendRequest(to: "/libraries", method: .GET, body: body)
+    let _ = try Library.create(title: title, on: conn)
+    let response = try app.makeLibrariesRequest() // Dependency injection
     let content = try response.content
       .decode(Array<Library>.self)
       .wait()
@@ -29,14 +28,15 @@ class LibrariesTest: XCTestCase {
     XCTAssertEqual(content[0].title, title)
   }
 
-  func testThatLibrariesBooksReturned() throws {
+  func testThatLibrariesBooksReturnWithValidID() throws {
     let lib_title = "Alexandra", book_title = "Odyssey"
     let library = try Library.create(title: lib_title, on: conn)
-    let book = try Book.create(title: book_title, library_id: library.id!, on: conn)
-    let body : EmptyBody? = nil
-    let response = try app.sendRequest(to: "/libraries/\(library.id!)/books",
-                                       method: .GET,
-                                       body: body)
+    let _ = try Book.create(
+      title     : book_title,
+      library_id: library.id!,
+      on        : conn
+    )
+    let response = try app.makeLibrariesBooksRequest(with: library.id!) // Dependency injection
     let content = try response.content
       .decode(Array<Book>.self)
       .wait()
