@@ -19,12 +19,12 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
 
     // Configure a SQLite database
     let postgresqlConfig = PostgreSQLDatabaseConfig(
-        hostname: "127.0.0.1",
+        hostname: env == .production ? "library-api-db" : "127.0.0.1",
         port: 5432,
         username: "postgres",
-        database: env == Environment.testing ?
+        database: env == .testing ?
         "library_api_test" : "library_api",
-        password: nil
+        password: "postgres"
     )
     services.register(postgresqlConfig)
 

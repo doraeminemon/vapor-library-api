@@ -1,0 +1,23 @@
+version: "3"
+services:
+  db:
+    image: postgres:10-alpine
+    container_name: library-api-db
+    environment:
+      - POSTGRES_DB=library_api
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - nginx-network
+  server:
+    image: library-api-release
+    container_name: library-api-server
+    command: swift run Run --env=production
+    ports:
+      - "8080:80"
+    networks:
+      - nginx-network
+    depends_on:
+      - db
+networks:
+  nginx-network:
+    external: true
